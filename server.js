@@ -66,7 +66,7 @@ app.get('/bad', (req, res)=>{
       errorMessage: 'Unable to fulfill the request'
     });
 });
-//4. Diciamo al server di ascoltare sulla porta 3000
+//Tell the express server to listen to heroku dynamic port o 3000 in localhost
 app.listen(port, ()=>{
-  console.log('Server is up on port 3000');
+  console.log('Server is up on port ', port);
 });
