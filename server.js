@@ -1,25 +1,25 @@
-//1. Richiamiamo express
+//Requiring Modules
 const express = require('express');
-//15. Richiamiamo fs per scrivere il file di log
 const fs = require('fs');
-//9. Richiamiamo il view engine per il dynamic templating
+//view engine for dynamic templating
 const hbs = require('hbs');
-//2. Creiamo un nuovo processo lanciando express
+//dynamic port for heroku deployement
+const port = process.env.PORT || 3000;
+//Launching express
 var app = express();
-//10. aggiungiamo il percorso ai partials per riutilizzare porzioni di codice markup
+//Registering Partials Static Path
 hbs.registerPartials(__dirname + '/views/partials');
-//11. registriamo un helper per la funzione data
+//Registering Helpers
 hbs.registerHelper('currentYear', ()=>{
   return new Date().getFullYear()
 });
 hbs.registerHelper('screamIt',(text)=>{
     return text.toUpperCase();
 });
-//7. aggiungiamo middleware per indicare una cartella statica
+//Middleware Express
 app.use(express.static(__dirname + '/public'));
-//12. Express Middleware (next indicherà quando termina questo middleware)
 app.use((req, res, next)=>{
-  //creiamo un logger nel nostro middleware appena registrato
+  //Logging requests
   var now = new Date().toString();
   var log = `${now}: Method - ${req.method} : Page Requested: ${req.url}`;
   fs.appendFile('server.log', log + '\n', (err) => {
@@ -28,18 +28,18 @@ app.use((req, res, next)=>{
     }
   });
   console.log(log);
-  //se non inseriamo next() l'handler non riesce a chiudere la chiamata in get lasciano il sito in caricamento perpetuo
   next();
 });
-//16. Modalità Manutenzione (renderizza e resta sempre qui dentro non essendoci next)
+//Maintanance Mode uncomment if needed
 // app.use((req, res, next) =>{
 //   res.render('maintenance.hbs');
 // });
-//3. Un po' di routing base. Se arriva una richiesta alla root path indichiamo la risposta
+//Root Path Routing
 app.get('/', (req, res) => {
+//Res.Send example
     // res.send('<h1>Hello Express</h1>');
     // res.send({
-    //   name: 'Nicola',
+    //   name: 'Nick',
     //   age: '22',
     //   categories: [
     //     'travel',
@@ -47,20 +47,18 @@ app.get('/', (req, res) => {
     //     'hiking'
     //   ]
     // });
-
-    res.render('home.hbs',{
+res.render('home.hbs',{
       pageTitle: 'About Page',
       welcomeMessage: 'Welcome Home',
-      // currentYear: new Date().getFullYear()        sostituito con hbs.helper()
+      // currentYear: new Date().getFullYear()        substituted with hbs.helper()
     });
 });
-//5. andiamo su chrome localhost:3000 e ispezioniamo dev tools
-//6. gestiamo il routing verson un'altra pagina
+//More Routing
 app.get('/about', (req,res)=>{
-    // res.send('About Page');
+    // res.send('About Page');                        substituted with hbs.partials
     res.render('about.hbs', {
       pageTitle: 'About Page',
-      // currentYear: new Date().getFullYear()
+      // currentYear: new Date().getFullYear()        substituted with hbs.helper()
     });
 });
 app.get('/bad', (req, res)=>{
@@ -69,6 +67,6 @@ app.get('/bad', (req, res)=>{
     });
 });
 //4. Diciamo al server di ascoltare sulla porta 3000
-app.listen(3000, ()=>{
+app.listen(port, ()=>{
   console.log('Server is up on port 3000');
 });
